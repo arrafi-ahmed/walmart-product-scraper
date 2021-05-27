@@ -84,7 +84,7 @@ const headers = {
         let ws_name = 'Sheet1'
         let date = new Date()
         date.setHours(date.getHours() + 6)
-        let localDate = date.toISOString().slice(0, 19)
+        let localDate = date.toISOString().slice(0, 19).replaceAll(':', '-')
         let fileName = 'output-' + localDate + '.xlsx'
         xlsx.utils.book_append_sheet(wb, ws, ws_name)
         xlsx.writeFile(wb, fileName)
