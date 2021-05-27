@@ -3,6 +3,11 @@ require('dotenv').config()
 const axios = require('axios')
 const xlsx = require('xlsx')
 
+if (products.length == 0) {
+  console.log('Product input empty')
+  return
+}
+
 const uuidv4 = () => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
