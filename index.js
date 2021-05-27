@@ -69,9 +69,9 @@ const headers = {
                 tempProducts.push(errorProduct)
 
                 if (error.response && error.response.status == 404) {
-                  console.log(`${index} -- ${product} * not found *`)
+                  console.log(`${index} -- ${product} *** not found`)
                 } else if (error.response && error.response.status == 401) {
-                  console.log(`${index} -- ${product} * authentication error *`)
+                  console.log(`${index} -- ${product} *** authentication error`)
                 } else {
                   console.log(error)
                 }
@@ -82,7 +82,10 @@ const headers = {
         let wb = xlsx.utils.book_new()
         let ws = xlsx.utils.json_to_sheet(tempProducts)
         let ws_name = 'Sheet1'
-        let fileName = 'output.xlsx'
+        let date = new Date()
+        date.setHours(date.getHours() + 6)
+        let localDate = date.toISOString().slice(0, 19)
+        let fileName = 'output-' + localDate + '.xlsx'
         xlsx.utils.book_append_sheet(wb, ws, ws_name)
         xlsx.writeFile(wb, fileName)
       })()

@@ -1,4 +1,4 @@
-//input proudct sku in string format inside the array
+//input proudct sku in string format
 exports.products = [
   
 ]
