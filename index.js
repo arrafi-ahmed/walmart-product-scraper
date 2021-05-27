@@ -77,7 +77,7 @@ const headers = {
                 }
               })
           })
-        )
+        ).catch((error) => console.log(error))
         // create output
         let wb = xlsx.utils.book_new()
         let ws = xlsx.utils.json_to_sheet(tempProducts)
