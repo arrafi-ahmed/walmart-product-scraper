@@ -1,13 +1,17 @@
-const { products } = require('./input')
 require('dotenv').config()
 const axios = require('axios')
 const xlsx = require('xlsx')
+
+//input from input.xlsx
+let wb = xlsx.readFile('input-SKU.xlsx')
+let ws = wb.Sheets['Sheet1']
+let products = xlsx.utils.sheet_to_json(ws)
 
 if (products.length == 0) {
   console.log('Product input empty')
   return
 }
-
+//generate uuid
 const uuidv4 = () => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
@@ -44,9 +48,12 @@ const headers = {
         await Promise.all(
           products.map((product, index) => {
             return axios
-              .get(`https://marketplace.walmartapis.com/v3/items/${product}`, {
-                headers: headersT,
-              })
+              .get(
+                `https://marketplace.walmartapis.com/v3/items/${product.SKU}`,
+                {
+                  headers: headersT,
+                }
+              )
               .then((response) => {
                 if (response.data.totalItems > 0) {
                   const {
@@ -56,22 +63,24 @@ const headers = {
                   } = response.data.ItemResponse[0]
                   const processedProduct = { index, sku, productName, amount }
                   tempProducts.push(processedProduct)
-                  console.log(`${index} -- ${product} added`)
+                  console.log(`${index} -- ${product.SKU} added`)
                 }
               })
               .catch((error) => {
                 const errorProduct = {
                   index,
-                  sku: product,
+                  sku: product.SKU,
                   productName: '---',
                   amount: '---',
                 }
                 tempProducts.push(errorProduct)
 
                 if (error.response && error.response.status == 404) {
-                  console.log(`${index} -- ${product} *** not found`)
+                  console.log(`${index} -- ${product.SKU} not found ***`)
                 } else if (error.response && error.response.status == 401) {
-                  console.log(`${index} -- ${product} *** authentication error`)
+                  console.log(
+                    `${index} -- ${product.SKU} authentication error ***`
+                  )
                 } else {
                   console.log(error)
                 }
