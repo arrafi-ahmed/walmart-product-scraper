@@ -4,10 +4,15 @@ const xlsx = require('xlsx')
 const pLimit = require('p-limit')
 
 const limit = pLimit(2)
+
 //input from input.xlsx
-let wb = xlsx.readFile('input.xlsx')
-let ws = wb.Sheets['Sheet1']
-let products = xlsx.utils.sheet_to_json(ws)
+let products = []
+for (let i = 0; i < 1000; i++) {
+  products.push({ upc: '631514612863' })
+}
+// let wb = xlsx.readFile('input.xlsx')
+// let ws = wb.Sheets['Sheet1']
+// let products = xlsx.utils.sheet_to_json(ws)
 
 if (products.length == 0) {
   console.log('Product input empty')
@@ -35,7 +40,7 @@ const headers = {
 }
 
 const tempProducts = []
-const addProduct = (index, upc, sku, title, price, tempProducts) => {
+const addProduct = (index, upc, sku, title, price) => {
   price = parseFloat(price).toFixed(2)
   const newProduct = { index, upc, price, sku, title }
   tempProducts.push(newProduct)
@@ -69,22 +74,15 @@ axios
                     itemId,
                     price: { amount },
                   } = response.data.items[0]
-                  addProduct(
-                    index,
-                    product.upc,
-                    itemId,
-                    title,
-                    amount,
-                    tempProducts
-                  )
+                  addProduct(index, product.upc, itemId, title, amount)
                   console.log(`${index} -- ${product.upc} added`)
                 } else {
-                  addProduct(index, product.upc, '---', '---', tempProducts)
+                  addProduct(index, product.upc, '---', '---')
                   console.log(`${index} -- invalid response`)
                 }
               })
               .catch((error) => {
-                addProduct(index, product.upc, '---', '---', tempProducts)
+                addProduct(index, product.upc, '---', '---')
                 if (error.response && error.response.status == 404) {
                   console.log(`${index} -- ${product.upc} not found ***`)
                 } else if (error.response && error.response.status == 401) {
