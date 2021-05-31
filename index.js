@@ -3,16 +3,12 @@ const axios = require('axios')
 const xlsx = require('xlsx')
 const pLimit = require('p-limit')
 
-const limit = pLimit(2)
+const limit = pLimit(10)
 
 //input from input.xlsx
-let products = []
-for (let i = 0; i < 1000; i++) {
-  products.push({ upc: '631514612863' })
-}
-// let wb = xlsx.readFile('input.xlsx')
-// let ws = wb.Sheets['Sheet1']
-// let products = xlsx.utils.sheet_to_json(ws)
+let wb = xlsx.readFile('input.xlsx')
+let ws = wb.Sheets['Sheet1']
+let products = xlsx.utils.sheet_to_json(ws)
 
 if (products.length == 0) {
   console.log('Product input empty')
@@ -75,23 +71,23 @@ axios
                     price: { amount },
                   } = response.data.items[0]
                   addProduct(index, product.upc, itemId, title, amount)
-                  console.log(`${index} -- ${product.upc} added`)
+                  console.log(`${index} -- ${product.upc} -- added`)
                 } else {
                   addProduct(index, product.upc, '---', '---')
-                  console.log(`${index} -- invalid response`)
+                  console.log(`${index} -- ${product.upc} -- invalid response`)
                 }
               })
               .catch((error) => {
                 addProduct(index, product.upc, '---', '---')
                 if (error.response && error.response.status == 404) {
-                  console.log(`${index} -- ${product.upc} not found ***`)
+                  console.log(`${index} -- ${product.upc} -- not found ***`)
                 } else if (error.response && error.response.status == 401) {
                   console.log(
-                    `${index} -- ${product.upc} authentication error ***`
+                    `${index} -- ${product.upc} -- authentication error ***`
                   )
                 } else if (error.isAxiosError) {
                   console.log(
-                    'Error: Client network socket disconnected before secure TLS connection was established'
+                    `${index} -- ${product.upc} -- Error: Client network socket disconnected before secure TLS connection was established`
                   )
                 } else {
                   console.log(error)
