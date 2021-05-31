@@ -35,8 +35,9 @@ const headers = {
 }
 
 const tempProducts = []
-const addProduct = (index, sku, productName, amount, tempProducts) => {
-  const newProduct = { index, sku, productName, amount }
+const addProduct = (index, upc, sku, title, price, tempProducts) => {
+  price = parseFloat(price).toFixed(2)
+  const newProduct = { index, upc, price, sku, title }
   tempProducts.push(newProduct)
 }
 // create token
@@ -56,32 +57,39 @@ axios
           return limit(() =>
             axios
               .get(
-                `https://marketplace.walmartapis.com/v3/items/${product.SKU}`,
+                `https://marketplace.walmartapis.com/v3/items/walmart/search?upc=${product.upc}`,
                 {
                   headers: headersT,
                 }
               )
               .then((response) => {
-                if (response.data.totalItems > 0) {
+                if (response.data.items.length > 0) {
                   const {
-                    sku,
-                    productName,
+                    title,
+                    itemId,
                     price: { amount },
-                  } = response.data.ItemResponse[0]
-                  addProduct(index, sku, productName, amount, tempProducts)
-                  console.log(`${index} -- ${product.SKU} added`)
+                  } = response.data.items[0]
+                  addProduct(
+                    index,
+                    product.upc,
+                    itemId,
+                    title,
+                    amount,
+                    tempProducts
+                  )
+                  console.log(`${index} -- ${product.upc} added`)
                 } else {
-                  addProduct(index, product.SKU, '---', '---', tempProducts)
+                  addProduct(index, product.upc, '---', '---', tempProducts)
                   console.log(`${index} -- invalid response`)
                 }
               })
               .catch((error) => {
-                addProduct(index, product.SKU, '---', '---', tempProducts)
+                addProduct(index, product.upc, '---', '---', tempProducts)
                 if (error.response && error.response.status == 404) {
-                  console.log(`${index} -- ${product.SKU} not found ***`)
+                  console.log(`${index} -- ${product.upc} not found ***`)
                 } else if (error.response && error.response.status == 401) {
                   console.log(
-                    `${index} -- ${product.SKU} authentication error ***`
+                    `${index} -- ${product.upc} authentication error ***`
                   )
                 } else if (error.isAxiosError) {
                   console.log(
