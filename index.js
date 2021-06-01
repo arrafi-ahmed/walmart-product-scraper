@@ -55,6 +55,7 @@ axios
     ;(async () => {
       await Promise.all(
         products.map((product, index) => {
+          console.log(index)
           return limit(() =>
             axios
               .get(
@@ -64,7 +65,7 @@ axios
                 }
               )
               .then((response) => {
-                if (response.data.items.length > 0) {
+                if (response.data.items && response.data.items.length > 0) {
                   const {
                     title,
                     itemId,
@@ -73,12 +74,12 @@ axios
                   addProduct(index, product.upc, itemId, title, amount)
                   console.log(`${index} -- ${product.upc} -- added`)
                 } else {
-                  addProduct(index, product.upc, '---', '---')
+                  addProduct(index, product.upc, '---', '---', '---')
                   console.log(`${index} -- ${product.upc} -- invalid response`)
                 }
               })
               .catch((error) => {
-                addProduct(index, product.upc, '---', '---')
+                addProduct(index, product.upc, '---', '---', '---')
                 if (error.response && error.response.status == 404) {
                   console.log(`${index} -- ${product.upc} -- not found ***`)
                 } else if (error.response && error.response.status == 401) {
